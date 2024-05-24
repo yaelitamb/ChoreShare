@@ -1,12 +1,12 @@
 class Chore {
-  final int id;
-  final String name;
-  final String description;
-  final List<int> assignedProfiles;
-  final bool rotation;
-  final String repetition;
-  final String every;
-  final List<String> days;
+  int id;
+  String name;
+  String description;
+  List<int> assignedProfiles;
+  bool rotation;
+  String repetition;
+  String every;
+  List<String> days;
 
   Chore({
     required this.id,

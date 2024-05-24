@@ -6,43 +6,29 @@ import '../models/chore.dart';
 import '../main.dart';
 
 class JoinHouseholdScreen extends StatelessWidget {
-  final _householdIdController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Join Household'),
+        title: Text('Join Existing Household'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          children: [
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
             TextField(
-              controller: _householdIdController,
-              decoration: InputDecoration(labelText: 'Enter your household ID'),
+              decoration: InputDecoration(
+                labelText: 'Enter your household ID',
+              ),
             ),
+            SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async {
-                final id = _householdIdController.text;
-                if (id.isNotEmpty) {
-                  // Assuming the household ID is used to retrieve data from a remote server
-                  // For simplicity, we just check if profiles or chores exist in the local database
-                  final profiles = await Provider.of<ChoreShareDatabase>(context, listen: false).getProfiles();
-                  final chores = await Provider.of<ChoreShareDatabase>(context, listen: false).getChores();
-                  
-                  if (profiles.isNotEmpty || chores.isNotEmpty) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => MainScreen()),
-                    );
-                  } else {
-                    // Show error if no data is found
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('No household found with this ID'),
-                    ));
-                  }
-                }
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MainScreen()), // Asegúrate de tener MainScreen en main.dart
+                );
               },
               child: Text('Join'),
             ),
@@ -52,4 +38,3 @@ class JoinHouseholdScreen extends StatelessWidget {
     );
   }
 }
-

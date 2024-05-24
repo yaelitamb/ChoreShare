@@ -1,47 +1,31 @@
 import 'package:flutter/material.dart';
-import '../models/chore.dart';
+import 'package:provider/provider.dart';
 import '../database.dart';
+import '../models/chore.dart';
+import '../models/profile.dart';
 
 class AssignChoresScreen extends StatefulWidget {
+  final List<Chore> chores;
+
+  AssignChoresScreen({required this.chores});
+
   @override
   _AssignChoresScreenState createState() => _AssignChoresScreenState();
 }
 
 class _AssignChoresScreenState extends State<AssignChoresScreen> {
-  List<Chore> _chores = [];
-  Chore? _selectedChore;
+  late List<Profile> _profiles;
+  late List<bool> _selectedProfiles;
 
   @override
   void initState() {
     super.initState();
-    _loadChores();
+    _loadProfiles();
   }
 
-  Future<void> _loadChores() async {
-    final chores = await ChoreShareDatabase.instance.getChores();
-    setState(() {
-      _chores = chores;
-    });
-  }
-
-  void _updateChore(Chore chore, String newRepetition) {
-    final updatedChore = Chore(
-      id: chore.id,
-      name: chore.name,
-      description: chore.description,
-      assignedProfiles: chore.assignedProfiles,
-      rotation: chore.rotation,
-      repetition: newRepetition,
-      every: chore.every,
-      days: chore.days,
-    );
-
-    // Aquí puedes guardar el updatedChore en la base de datos si es necesario
-    ChoreShareDatabase.instance.insertChore(updatedChore);
-
-    setState(() {
-      _chores[_chores.indexWhere((c) => c.id == chore.id)] = updatedChore;
-    });
+  Future<void> _loadProfiles() async {
+    _profiles = await Provider.of<ChoreShareDatabase>(context, listen: false).getProfiles();
+    _selectedProfiles = List<bool>.filled(_profiles.length, false);
   }
 
   @override
@@ -50,49 +34,86 @@ class _AssignChoresScreenState extends State<AssignChoresScreen> {
       appBar: AppBar(
         title: Text('Assign Chores'),
       ),
-      body: ListView.builder(
-        itemCount: _chores.length,
-        itemBuilder: (context, index) {
-          final chore = _chores[index];
-          return ListTile(
-            title: Text(chore.name),
-            onTap: () {
-              setState(() {
-                _selectedChore = chore;
-              });
-              _showEditDialog(chore);
-            },
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView.builder(
+          itemCount: widget.chores.length,
+          itemBuilder: (context, index) {
+            final chore = widget.chores[index];
+            return ListTile(
+              title: Text(chore.name),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AssignChoreDetailScreen(chore: chore, profiles: _profiles),
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
+}
 
-  void _showEditDialog(Chore chore) {
-    String newRepetition = chore.repetition;
+class AssignChoreDetailScreen extends StatefulWidget {
+  final Chore chore;
+  final List<Profile> profiles;
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Edit Chore'),
-          content: TextField(
-            onChanged: (value) {
-              newRepetition = value;
-            },
-            decoration: InputDecoration(labelText: 'Repetition'),
-          ),
-          actions: [
-            TextButton(
+  AssignChoreDetailScreen({required this.chore, required this.profiles});
+
+  @override
+  _AssignChoreDetailScreenState createState() => _AssignChoreDetailScreenState();
+}
+
+class _AssignChoreDetailScreenState extends State<AssignChoreDetailScreen> {
+  late List<bool> _selectedProfiles;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedProfiles = List<bool>.filled(widget.profiles.length, false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Assign Chore: ${widget.chore.name}'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text('Assign Profiles:'),
+            Expanded(
+              child: ListView.builder(
+                itemCount: widget.profiles.length,
+                itemBuilder: (context, index) {
+                  final profile = widget.profiles[index];
+                  return CheckboxListTile(
+                    title: Text(profile.name),
+                    value: _selectedProfiles[index],
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _selectedProfiles[index] = value ?? false;
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
+            ElevatedButton(
               onPressed: () {
-                _updateChore(chore, newRepetition);
-                Navigator.of(context).pop();
+                // Handle assigning profiles to chore here
               },
               child: Text('Save'),
             ),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 }
