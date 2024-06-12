@@ -43,7 +43,7 @@ class HomeScreen extends StatelessWidget {
             Image.asset('assets/logo.png'), // Asegúrate de usar el nombre correcto de tu imagen
             SizedBox(height: 20),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: TextStyle(color: Colors.white),),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: TextStyle(color: Colors.white),),
               onPressed: () {
                 Navigator.push(
                   context,

@@ -51,11 +51,20 @@ class ChoreShareDatabase with ChangeNotifier {
     await db.execute(choreTable);
   }
 
-  Future<int> insertProfile(Profile profile) async {
+ Future<int> insertProfile(Profile profile) async {
     final db = await instance.database;
-    final id = await db.insert('profiles', profile.toMap());
-    notifyListeners(); // Notifica a los oyentes después de insertar un perfil
-    return id;
+    return await db.insert('profiles', profile.toMap());
+  }
+
+  Future<List<Profile>> getProfiles() async {
+    final db = await instance.database;
+    final result = await db.query('profiles');
+    return result.map((json) => Profile.fromMap(json)).toList();
+  }
+
+  Future<int> deleteProfile(int id) async {
+    final db = await instance.database;
+    return await db.delete('profiles', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<int> insertChore(Chore chore) async {
@@ -65,11 +74,6 @@ class ChoreShareDatabase with ChangeNotifier {
     return id;
   }
 
-  Future<List<Profile>> getProfiles() async {
-    final db = await instance.database;
-    final result = await db.query('profiles');
-    return result.map((json) => Profile.fromMap(json)).toList();
-  }
 
   Future<List<Chore>> getChores() async {
     final db = await instance.database;
