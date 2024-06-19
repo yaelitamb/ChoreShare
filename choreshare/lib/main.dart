@@ -6,21 +6,19 @@ import 'screens/join_household.dart';
 import 'screens/household_screen.dart';
 import 'screens/chores_screen.dart';
 import 'screens/done_screen.dart';
-import 'screens/add_chores.dart';
-import 'screens/assign_chores.dart';
-import 'models/chore.dart';
-import 'package:just_audio/just_audio.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ChoreShareDatabase.instance,
-      child: MyApp(),
+    ChangeNotifierProvider<ChoreShareDatabase>(
+      create: (_) => ChoreShareDatabase.instance,
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,110 +26,104 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeScreen(),
+      home: const HomeScreen(),
     );
   }
 }
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ChoreShare'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image.asset('assets/logo.png'), // Asegúrate de usar el nombre correcto de tu imagen
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: const TextStyle(color: Colors.white),),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CreateHouseholdScreen()),
+                );
+              },
+              child: const Text('Create New Household'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: const TextStyle(color: Colors.white),),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const JoinHouseholdScreen()),
+                );
+              },
+              child: const Text('Join Existing Household'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  late AudioPlayer _player;
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
   @override
-  void initState() {
-    super.initState();
-    _player = AudioPlayer();
-    _initAudioPlayer();
-  }
+  _MainScreenState createState() => _MainScreenState();
+}
 
-  Future<void> _initAudioPlayer() async {
-    await _player.setLoopMode(LoopMode.one);
-    await _player.setAsset('assets/background.mp3');
-    _player.play();
-  }
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
 
-  @override
-  void dispose() {
-    _player.dispose();
-    super.dispose();
+  static final List<Widget> _widgetOptions = <Widget>[
+    const HouseholdScreen(),
+    const ChoresScreen(),
+    const DoneScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ChoreShare'),
+        title: const Text('ChoreShare'),
       ),
-      body: FutureBuilder<List<Chore>>(
-        future: Provider.of<ChoreShareDatabase>(context).getChores(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          final chores = snapshot.data!;
-          return CalendarScreen(chores: chores);
-        },
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
       ),
-    );
-  }
-}
-
-class CalendarScreen extends StatelessWidget {
-  final List<Chore> chores;
-
-  CalendarScreen({required this.chores});
-
-  @override
-  Widget build(BuildContext context) {
-    final today = DateTime.now();
-
-    return Column(
-      children: [
-        // Implement your calendar view here
-        Expanded(
-          child: ListView.builder(
-            itemCount: chores.length,
-            itemBuilder: (context, index) {
-              final chore = chores[index];
-              final assignedProfiles = chore.assignedProfiles.map((profile) => profile.name).join(', ');
-              final assignedDays = chore.days.map((day) => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][day]).join(', ');
-
-              return ListTile(
-                title: Text(chore.name),
-                subtitle: Text('Assigned to: ${assignedProfiles ?? 'N/A'}\nDays: $assignedDays'),
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Task: ${chore.name}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                            SizedBox(height: 8),
-                            Text('Description: ${chore.description}'),
-                            SizedBox(height: 8),
-                            Text('Assigned to: ${assignedProfiles ?? 'N/A'}'),
-                            SizedBox(height: 8),
-                            Text('Days: $assignedDays'),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              );
-            },
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Household',
           ),
-        ),
-      ],
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Chores',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.done),
+            label: 'Done',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+      ),
     );
   }
 }
