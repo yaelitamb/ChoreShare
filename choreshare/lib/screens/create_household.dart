@@ -63,7 +63,7 @@ class _CreateHouseholdScreenState extends State<CreateHouseholdScreen> {
                           _selectedColor = newValue!;
                         });
                       },
-                      items: <String>['Red', 'Green', 'Blue', 'Yellow']
+                      items: <String>['Red', 'Green', 'Blue', 'Purple', 'Pink', 'Orange', 'Yellow']
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
