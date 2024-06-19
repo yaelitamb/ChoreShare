@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'database.dart';
+import 'audio_service.dart';
 import 'screens/create_household.dart';
 import 'screens/join_household.dart';
 import 'screens/household_screen.dart';
@@ -14,6 +15,10 @@ void main() {
       child: const MyApp(),
     ),
   );
+
+  
+  final audioService = AudioService();
+  audioService.playBackgroundMusic();
 }
 
 class MyApp extends StatelessWidget {
@@ -44,7 +49,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image.asset('assets/logo.png'), // Asegúrate de usar el nombre correcto de tu imagen
+            Image.asset('assets/logo.png'),
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: const TextStyle(color: Colors.white),),
