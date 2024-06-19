@@ -6,11 +6,19 @@ import 'screens/join_household.dart';
 import 'screens/household_screen.dart';
 import 'screens/chores_screen.dart';
 import 'screens/done_screen.dart';
+import 'audio_provider.dart'; // Importa el proveedor de audio
 
 void main() {
   runApp(
-    ChangeNotifierProvider<ChoreShareDatabase>(
-      create: (_) => ChoreShareDatabase.instance,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<ChoreShareDatabase>(
+          create: (_) => ChoreShareDatabase.instance,
+        ),
+        ChangeNotifierProvider<AudioProvider>(
+          create: (_) => AudioProvider(),
+        ),
+      ],
       child: const MyApp(),
     ),
   );
@@ -36,6 +44,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('ChoreShare'),
@@ -47,8 +57,12 @@ class HomeScreen extends StatelessWidget {
             Image.asset('assets/logo.png'), // Asegúrate de usar el nombre correcto de tu imagen
             const SizedBox(height: 20),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: const TextStyle(color: Colors.white),),
-              onPressed: () {
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                textStyle: const TextStyle(color: Colors.white),
+              ),
+              onPressed: () async {
+                await audioProvider.startPlaying(); // Inicia la reproducción del audio
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const CreateHouseholdScreen()),
@@ -58,7 +72,10 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: const TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                textStyle: const TextStyle(color: Colors.white),
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -85,7 +102,7 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   static final List<Widget> _widgetOptions = <Widget>[
-     HouseholdScreen(),
+    HouseholdScreen(),
     const ChoresScreen(),
     const DoneScreen(),
   ];
