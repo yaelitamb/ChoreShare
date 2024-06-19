@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class DoneScreen extends StatelessWidget {
+  const DoneScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Done Tasks'),
+        title: const Text('Done Tasks'),
       ),
       body: ListView.builder(
         itemCount: 10, // Este es solo un ejemplo, debes ajustarlo según tus necesidades

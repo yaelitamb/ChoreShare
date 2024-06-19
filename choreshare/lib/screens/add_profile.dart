@@ -7,6 +7,8 @@ import '../database.dart';
 import '../models/profile.dart';
 
 class AddProfileScreen extends StatefulWidget {
+  const AddProfileScreen({super.key});
+
   @override
   _AddProfileScreenState createState() => _AddProfileScreenState();
 }
@@ -43,13 +45,13 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add Profile'),
+          title: const Text('Add Profile'),
           content: SingleChildScrollView(
             child: Column(
               children: [
                 TextField(
                   controller: _nameController,
-                  decoration: InputDecoration(labelText: 'Name'),
+                  decoration: const InputDecoration(labelText: 'Name'),
                 ),
                 DropdownButton<String>(
                   value: _selectedColor,
@@ -68,11 +70,11 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
                 ),
                 ElevatedButton(
                   onPressed: _pickImage,
-                  child: Text('Pick Image'),
+                  child: const Text('Pick Image'),
                 ),
                 _image != null
                     ? Image.file(_image!)
-                    : Text('No image selected.'),
+                    : const Text('No image selected.'),
               ],
             ),
           ),
@@ -99,7 +101,7 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
                   Navigator.of(context).pop();
                 }
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );
@@ -113,7 +115,7 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Profiles'),
+        title: const Text('Add Profiles'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -121,14 +123,14 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
           children: [
             ElevatedButton(
               onPressed: () => _showAddProfileDialog(context, db),
-              child: Text('Add Profile'),
+              child: const Text('Add Profile'),
             ),
             Expanded(
               child: FutureBuilder<List<Profile>>(
                 future: db.getProfiles(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
 
                   final profiles = snapshot.data!;
@@ -142,7 +144,7 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
                         title: Text(profile.name),
                         subtitle: Text(profile.color),
                         trailing: IconButton(
-                          icon: Icon(Icons.delete),
+                          icon: const Icon(Icons.delete),
                           onPressed: () async {
                             await db.deleteProfile(profile.id);
                             setState(() {});
@@ -158,7 +160,7 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
               onPressed: () {
                 // Lógica para continuar a la siguiente pantalla, si es necesario
               },
-              child: Text('Continue'),
+              child: const Text('Continue'),
             ),
           ],
         ),

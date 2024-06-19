@@ -7,7 +7,7 @@ import '../models/profile.dart';
 class AssignChoresScreen extends StatefulWidget {
   final List<Chore> chores;
 
-  AssignChoresScreen({required this.chores});
+  const AssignChoresScreen({super.key, required this.chores});
 
   @override
   _AssignChoresScreenState createState() => _AssignChoresScreenState();
@@ -32,7 +32,7 @@ class _AssignChoresScreenState extends State<AssignChoresScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Assign Chores'),
+        title: const Text('Assign Chores'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -62,7 +62,7 @@ class AssignChoreDetailScreen extends StatefulWidget {
   final Chore chore;
   final List<Profile> profiles;
 
-  AssignChoreDetailScreen({required this.chore, required this.profiles});
+  const AssignChoreDetailScreen({super.key, required this.chore, required this.profiles});
 
   @override
   _AssignChoreDetailScreenState createState() => _AssignChoreDetailScreenState();
@@ -87,7 +87,7 @@ class _AssignChoreDetailScreenState extends State<AssignChoreDetailScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text('Assign Profiles:'),
+            const Text('Assign Profiles:'),
             Expanded(
               child: ListView.builder(
                 itemCount: widget.profiles.length,
@@ -109,7 +109,7 @@ class _AssignChoreDetailScreenState extends State<AssignChoreDetailScreen> {
               onPressed: () {
                 // Handle assigning profiles to chore here
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         ),

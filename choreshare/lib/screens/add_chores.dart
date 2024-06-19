@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../database.dart';
 import '../models/chore.dart';
 import 'assign_chores.dart';
 
 class AddChoresScreen extends StatefulWidget {
+  const AddChoresScreen({super.key});
+
   @override
   _AddChoresScreenState createState() => _AddChoresScreenState();
 }
@@ -17,7 +17,7 @@ class _AddChoresScreenState extends State<AddChoresScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Chores'),
+        title: const Text('Add Chores'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -52,17 +52,20 @@ class _AddChoresScreenState extends State<AddChoresScreen> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                final newChore = await Navigator.push<Chore>(
                   context,
-                  MaterialPageRoute(builder: (context) => CreateChoreScreen(onSave: (chore) {
-                    setState(() {
-                      _chores.add(chore);
-                    });
-                  })),
+                  MaterialPageRoute(builder: (context) => const CreateChoreScreen()),
                 );
+
+                if (newChore != null) {
+                  setState(() {
+                    _defaultChores.add(newChore.name);
+                    _chores.add(newChore);
+                  });
+                }
               },
-              child: Text('Create your own chore'),
+              child: const Text('Create your own chore'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -71,7 +74,7 @@ class _AddChoresScreenState extends State<AddChoresScreen> {
                   MaterialPageRoute(builder: (context) => AssignChoresScreen(chores: _chores)),
                 );
               },
-              child: Text('Continue'),
+              child: const Text('Continue'),
             ),
           ],
         ),
@@ -81,9 +84,7 @@ class _AddChoresScreenState extends State<AddChoresScreen> {
 }
 
 class CreateChoreScreen extends StatefulWidget {
-  final Function(Chore) onSave;
-
-  CreateChoreScreen({required this.onSave});
+  const CreateChoreScreen({super.key});
 
   @override
   _CreateChoreScreenState createState() => _CreateChoreScreenState();
@@ -97,7 +98,7 @@ class _CreateChoreScreenState extends State<CreateChoreScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Chore'),
+        title: const Text('Create Chore'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -105,11 +106,11 @@ class _CreateChoreScreenState extends State<CreateChoreScreen> {
           children: [
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: 'Name'),
+              decoration: const InputDecoration(labelText: 'Name'),
             ),
             TextField(
               controller: _descriptionController,
-              decoration: InputDecoration(labelText: 'Description'),
+              decoration: const InputDecoration(labelText: 'Description'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -124,11 +125,10 @@ class _CreateChoreScreenState extends State<CreateChoreScreen> {
                     every: 'Week',
                     days: [],
                   );
-                  widget.onSave(chore);
-                  Navigator.pop(context);
+                  Navigator.pop(context, chore);
                 }
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         ),

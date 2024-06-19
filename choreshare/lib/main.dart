@@ -11,12 +11,14 @@ void main() {
   runApp(
     ChangeNotifierProvider<ChoreShareDatabase>(
       create: (_) => ChoreShareDatabase.instance,
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,44 +26,46 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeScreen(),
+      home: const HomeScreen(),
     );
   }
 }
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ChoreShare'),
+        title: const Text('ChoreShare'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Image.asset('assets/logo.png'), // Asegúrate de usar el nombre correcto de tu imagen
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: const TextStyle(color: Colors.white),),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CreateHouseholdScreen()),
+                  MaterialPageRoute(builder: (context) => const CreateHouseholdScreen()),
                 );
               },
-              child: Text('Create New Household'),
+              child: const Text('Create New Household'),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: const TextStyle(color: Colors.white),),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => JoinHouseholdScreen()),
+                  MaterialPageRoute(builder: (context) => const JoinHouseholdScreen()),
                 );
               },
-              child: Text('Join Existing Household'),
+              child: const Text('Join Existing Household'),
             ),
           ],
         ),
@@ -71,6 +75,8 @@ class HomeScreen extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -78,10 +84,10 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  static List<Widget> _widgetOptions = <Widget>[
-    HouseholdScreen(),
-    ChoresScreen(),
-    DoneScreen(),
+  static final List<Widget> _widgetOptions = <Widget>[
+    const HouseholdScreen(),
+    const ChoresScreen(),
+    const DoneScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -94,7 +100,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ChoreShare'),
+        title: const Text('ChoreShare'),
       ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),

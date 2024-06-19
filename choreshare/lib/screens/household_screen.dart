@@ -5,6 +5,8 @@ import '../models/profile.dart';
 import '../models/chore.dart';
 
 class HouseholdScreen extends StatefulWidget {
+  const HouseholdScreen({super.key});
+
   @override
   _HouseholdScreenState createState() => _HouseholdScreenState();
 }
@@ -33,7 +35,7 @@ class _HouseholdScreenState extends State<HouseholdScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Household'),
+        title: const Text('Household'),
       ),
       body: ListView.builder(
         itemCount: _profiles.length,
@@ -58,7 +60,7 @@ class _HouseholdScreenState extends State<HouseholdScreen> {
         onPressed: () {
           // Navigate to add profile screen
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }

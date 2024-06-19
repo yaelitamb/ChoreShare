@@ -4,6 +4,8 @@ import '../database.dart';
 import '../models/chore.dart';
 
 class ChoresScreen extends StatefulWidget {
+  const ChoresScreen({super.key});
+
   @override
   _ChoresScreenState createState() => _ChoresScreenState();
 }
@@ -28,7 +30,7 @@ class _ChoresScreenState extends State<ChoresScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chores'),
+        title: const Text('Chores'),
       ),
       body: ListView.builder(
         itemCount: _chores.length,
@@ -37,7 +39,7 @@ class _ChoresScreenState extends State<ChoresScreen> {
           return ListTile(
             title: Text(chore.name),
             subtitle: Text('Every ${chore.repetition}'),
-            trailing: Icon(Icons.check_box_outline_blank),
+            trailing: const Icon(Icons.check_box_outline_blank),
           );
         },
       ),
@@ -45,7 +47,7 @@ class _ChoresScreenState extends State<ChoresScreen> {
         onPressed: () {
           // Navigate to add chore screen
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
