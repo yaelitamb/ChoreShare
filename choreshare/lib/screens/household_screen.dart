@@ -1,109 +1,167 @@
 import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:provider/provider.dart';
+import '/models/profile.dart';
+import '/models/chore.dart';
 import '../database.dart';
-import '../models/profile.dart';
-import '../models/chore.dart';
-import 'add_profile.dart'; // Asegúrate de importar la pantalla AddProfileScreen
-import 'add_chores.dart'; // Asegúrate de importar la pantalla AddChoresScreen
-import 'done_screen.dart'; // Asegúrate de importar la pantalla DoneScreen
-import 'package:table_calendar/table_calendar.dart'; // Importa el paquete necesario para el calendario
 
 class HouseholdScreen extends StatefulWidget {
-  const HouseholdScreen({Key? key}) : super(key: key);
-
   @override
   _HouseholdScreenState createState() => _HouseholdScreenState();
 }
 
 class _HouseholdScreenState extends State<HouseholdScreen> {
-  List<Profile> _profiles = [];
-  List<Chore> _chores = [];
-
-  // Variables para el calendario
+  Map<DateTime, List<Chore>> _events = {};
   DateTime _selectedDay = DateTime.now();
-  Map<DateTime, List<dynamic>> _events = {};
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-  DateTime _focusedDay = DateTime.now();
+  List<Chore> _selectedChores = [];
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _loadChores();
   }
 
-  Future<void> _loadData() async {
-    final profiles = await Provider.of<ChoreShareDatabase>(context, listen: false).getProfiles();
-    final chores = await Provider.of<ChoreShareDatabase>(context, listen: false).getChores();
-
+  Future<void> _loadChores() async {
+    final db = Provider.of<ChoreShareDatabase>(context, listen: false);
+    final chores = await db.getChores();
     setState(() {
-      _profiles = profiles;
-      _chores = chores;
+      _events = _generateEvents(chores);
     });
+  }
+
+  Map<DateTime, List<Chore>> _generateEvents(List<Chore> chores) {
+    Map<DateTime, List<Chore>> events = {};
+    for (var chore in chores) {
+      for (var day in chore.days) {
+        DateTime date = _getDateFromDayString(day);
+        if (events.containsKey(date)) {
+          events[date]!.add(chore);
+        } else {
+          events[date] = [chore];
+        }
+      }
+    }
+    return events;
+  }
+
+  DateTime _getDateFromDayString(String day) {
+    int currentWeekday = DateTime.now().weekday;
+    int targetWeekday = _getWeekdayFromString(day);
+    int difference = targetWeekday - currentWeekday;
+    if (difference < 0) difference += 7;
+    return DateTime.now().add(Duration(days: difference));
+  }
+
+  int _getWeekdayFromString(String day) {
+    switch (day) {
+      case 'Monday':
+        return 1;
+      case 'Tuesday':
+        return 2;
+      case 'Wednesday':
+        return 3;
+      case 'Thursday':
+        return 4;
+      case 'Friday':
+        return 5;
+      case 'Saturday':
+        return 6;
+      case 'Sunday':
+        return 7;
+      default:
+        return 1;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Household'),
+        title: Text('Household Calendar'),
       ),
-      body: ListView.builder(
-        itemCount: _profiles.length,
-        itemBuilder: (context, index) {
-          final profile = _profiles[index];
-          final assignedChores = _chores.where((chore) => chore.assignedProfiles.contains(profile.id)).toList();
+      body: Column(
+        children: [
+          TableCalendar(
+            focusedDay: _selectedDay,
+            firstDay: DateTime(2020),
+            lastDay: DateTime(2030),
+            eventLoader: (day) => _events[day] ?? [],
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _selectedChores = _events[selectedDay] ?? [];
+              });
+            },
+            calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, date, events) {
+                if (events.isNotEmpty) {
+                  return Positioned(
+                    right: 1,
+                    bottom: 1,
+                    child: _buildMarkers(events),
+                  );
+                }
+                return SizedBox();
+              },
+            ),
+          ),
+          ..._selectedChores.map(
+            (chore) => ListTile(
+              title: Text(chore.name),
+              subtitle: Text(chore.description),
+              trailing: Text(chore.assignedProfiles.join(', ')),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.primaries[index % Colors.primaries.length],
-              child: Text(profile.name[0]),
-            ),
-            title: Text(profile.name),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: assignedChores.map((chore) => Text(chore.name)).toList(),
-            ),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddProfileScreen()),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-      bottomNavigationBar: Container(
-        margin: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        padding: EdgeInsets.all(8),
-        child: TableCalendar(
-          firstDay: DateTime.utc(2023, 01, 01),
-          lastDay: DateTime.utc(2030, 12, 31),
-          focusedDay: _focusedDay,
-          calendarFormat: _calendarFormat,
-          selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-          onDaySelected: (selectedDay, focusedDay) {
-            setState(() {
-              _selectedDay = selectedDay;
-              _focusedDay = focusedDay; // actualizar `_focusedDay` también
-            });
-            // Lógica para cargar eventos para `selectedDay` y actualizar `_events` si es necesario
+  Widget _buildMarkers(List<dynamic> events) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: events.map((event) {
+        final chore = event as Chore;
+        return FutureBuilder<Profile>(
+          future: Provider.of<ChoreShareDatabase>(context, listen: false)
+              .getProfile(chore.assignedProfiles.first),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Container(
+                width: 7.0,
+                height: 7.0,
+                margin: const EdgeInsets.symmetric(horizontal: 0.5),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey,
+                ),
+              );
+            } else if (snapshot.hasError) {
+              return Container(
+                width: 7.0,
+                height: 7.0,
+                margin: const EdgeInsets.symmetric(horizontal: 0.5),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.red,
+                ),
+              );
+            } else {
+              final profile = snapshot.data!;
+              return Container(
+                width: 7.0,
+                height: 7.0,
+                margin: const EdgeInsets.symmetric(horizontal: 0.5),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(int.parse(profile.color)),
+                ),
+              );
+            }
           },
-          onPageChanged: (focusedDay) {
-            _focusedDay = focusedDay;
-          },
-          eventLoader: (day) {
-            // Retorna eventos para el día dado desde el mapa `_events`
-            return _events[day] ?? [];
-          },
-        ),
-      ),
+        );
+      }).toList(),
     );
   }
 }

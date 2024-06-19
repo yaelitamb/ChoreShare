@@ -8,7 +8,7 @@ import 'household_screen.dart';
 class AssignChoresScreen extends StatefulWidget {
   final List<Chore> chores;
 
-  const AssignChoresScreen({Key? key, required this.chores}) : super(key: key);
+  const AssignChoresScreen({super.key, required this.chores});
 
   @override
   _AssignChoresScreenState createState() => _AssignChoresScreenState();
@@ -57,7 +57,7 @@ class _AssignChoresScreenState extends State<AssignChoresScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const HouseholdScreen()),
+            MaterialPageRoute(builder: (context) =>  HouseholdScreen()),
           );
         },
         child: const Icon(Icons.navigate_next),
@@ -71,7 +71,7 @@ class AssignChoreDetailScreen extends StatefulWidget {
   final Chore chore;
   final List<Profile> profiles;
 
-  const AssignChoreDetailScreen({Key? key, required this.chore, required this.profiles}) : super(key: key);
+  const AssignChoreDetailScreen({super.key, required this.chore, required this.profiles});
 
   @override
   _AssignChoreDetailScreenState createState() => _AssignChoreDetailScreenState();

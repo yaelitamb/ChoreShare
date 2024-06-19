@@ -85,7 +85,7 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   static final List<Widget> _widgetOptions = <Widget>[
-    const HouseholdScreen(),
+     HouseholdScreen(),
     const ChoresScreen(),
     const DoneScreen(),
   ];

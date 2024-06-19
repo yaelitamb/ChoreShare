@@ -37,11 +37,11 @@ class Chore {
       id: map['id'],
       name: map['name'],
       description: map['description'],
-      assignedProfiles: map['assignedProfiles'].split(',').map((id) => int.parse(id)).toList(),
+      assignedProfiles: (map['assignedProfiles'] as String).split(',').map((id) => int.parse(id)).toList(),
       rotation: map['rotation'] == 1,
       repetition: map['repetition'],
       every: map['every'],
-      days: map['days'].split(','),
+      days: (map['days'] as String).split(','),
     );
   }
 }

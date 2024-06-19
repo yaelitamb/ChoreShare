@@ -62,6 +62,16 @@ class ChoreShareDatabase with ChangeNotifier {
     return result.map((json) => Profile.fromMap(json)).toList();
   }
 
+  Future<Profile> getProfile(int id) async {
+    final db = await instance.database;
+    final result = await db.query('profiles', where: 'id = ?', whereArgs: [id]);
+    if (result.isNotEmpty) {
+      return Profile.fromMap(result.first);
+    } else {
+      throw Exception('Profile with id $id not found');
+    }
+  }
+
   Future<int> deleteProfile(int id) async {
     final db = await instance.database;
     return await db.delete('profiles', where: 'id = ?', whereArgs: [id]);
