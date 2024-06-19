@@ -35,6 +35,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  mockito: ^5.0.7  
   provider: ^6.1.2
   sqflite: ^2.0.0+4
   path: ^1.8.0
