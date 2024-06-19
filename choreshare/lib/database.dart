@@ -24,7 +24,7 @@ class ChoreShareDatabase with ChangeNotifier {
     return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
-  Future _createDB(Database db, int version) async {
+  Future<void> _createDB(Database db, int version) async {
     const profileTable = '''
     CREATE TABLE profiles (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,7 +51,7 @@ class ChoreShareDatabase with ChangeNotifier {
     await db.execute(choreTable);
   }
 
- Future<int> insertProfile(Profile profile) async {
+  Future<int> insertProfile(Profile profile) async {
     final db = await instance.database;
     return await db.insert('profiles', profile.toMap());
   }
@@ -74,14 +74,13 @@ class ChoreShareDatabase with ChangeNotifier {
     return id;
   }
 
-
   Future<List<Chore>> getChores() async {
     final db = await instance.database;
     final result = await db.query('chores');
     return result.map((json) => Chore.fromMap(json)).toList();
   }
 
-  Future close() async {
+  Future<void> close() async {
     final db = await instance.database;
     db.close();
   }

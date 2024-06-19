@@ -1,6 +1,6 @@
+import 'package:choreshare/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'database.dart';
 import 'audio_service.dart';
 import 'screens/create_household.dart';
 import 'screens/join_household.dart';
@@ -10,19 +10,45 @@ import 'screens/done_screen.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider<ChoreShareDatabase>(
+    ChangeNotifierProvider(
       create: (_) => ChoreShareDatabase.instance,
       child: const MyApp(),
     ),
   );
-
-  
-  final audioService = AudioService();
-  audioService.playBackgroundMusic();
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  final AudioService _audioService = AudioService();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _audioService.playBackgroundMusic();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _audioService.stopBackgroundMusic();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _audioService.stopBackgroundMusic();
+    } else if (state == AppLifecycleState.resumed) {
+      _audioService.playBackgroundMusic();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,22 +78,32 @@ class HomeScreen extends StatelessWidget {
             Image.asset('assets/logo.png'),
             const SizedBox(height: 20),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: const TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                textStyle: const TextStyle(color: Colors.white),
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const CreateHouseholdScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const CreateHouseholdScreen(),
+                  ),
                 );
               },
               child: const Text('Create New Household'),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, textStyle: const TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                textStyle: const TextStyle(color: Colors.white),
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const JoinHouseholdScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const JoinHouseholdScreen(),
+                  ),
                 );
               },
               child: const Text('Join Existing Household'),
