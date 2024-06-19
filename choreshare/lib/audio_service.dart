@@ -2,20 +2,32 @@ import 'package:audioplayers/audioplayers.dart';
 
 class AudioService {
   static final AudioService _instance = AudioService._internal();
-  factory AudioService() => _instance;
 
-  late AudioPlayer _audioPlayer;
-
-  AudioService._internal() {
-    _audioPlayer = AudioPlayer();
-    _audioPlayer.setReleaseMode(ReleaseMode.loop);  // Uso correcto de ReleaseMode
+  factory AudioService() {
+    return _instance;
   }
 
+  AudioService._internal();
+
+  late AudioPlayer _audioPlayer;
+  bool _isPlaying = false;
+
   Future<void> playBackgroundMusic() async {
-    await _audioPlayer.play(AssetSource('assets/background.mp3'));
+    _audioPlayer = AudioPlayer();
+
+    _audioPlayer.setReleaseMode(ReleaseMode.LOOP); // Reproducción en bucle
+
+    int result = await _audioPlayer.play('assets/background.mp3', isLocal: true);
+
+    if (result == 1) {
+      _isPlaying = true;
+    } else {
+      print('Error al reproducir audio');
+    }
   }
 
   Future<void> stopBackgroundMusic() async {
     await _audioPlayer.stop();
+    _isPlaying = false;
   }
 }
