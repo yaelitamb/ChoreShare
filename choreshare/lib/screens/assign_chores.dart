@@ -3,11 +3,12 @@ import 'package:provider/provider.dart';
 import '../database.dart';
 import '../models/chore.dart';
 import '../models/profile.dart';
+import 'household_screen.dart';
 
 class AssignChoresScreen extends StatefulWidget {
   final List<Chore> chores;
 
-  const AssignChoresScreen({super.key, required this.chores});
+  const AssignChoresScreen({Key? key, required this.chores}) : super(key: key);
 
   @override
   _AssignChoresScreenState createState() => _AssignChoresScreenState();
@@ -15,7 +16,6 @@ class AssignChoresScreen extends StatefulWidget {
 
 class _AssignChoresScreenState extends State<AssignChoresScreen> {
   late List<Profile> _profiles;
-  late List<bool> _selectedProfiles;
 
   @override
   void initState() {
@@ -25,7 +25,6 @@ class _AssignChoresScreenState extends State<AssignChoresScreen> {
 
   Future<void> _loadProfiles() async {
     _profiles = await Provider.of<ChoreShareDatabase>(context, listen: false).getProfiles();
-    _selectedProfiles = List<bool>.filled(_profiles.length, false);
   }
 
   @override
@@ -54,15 +53,25 @@ class _AssignChoresScreenState extends State<AssignChoresScreen> {
           },
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HouseholdScreen()),
+          );
+        },
+        child: const Icon(Icons.navigate_next),
+      ),
     );
   }
 }
+
 
 class AssignChoreDetailScreen extends StatefulWidget {
   final Chore chore;
   final List<Profile> profiles;
 
-  const AssignChoreDetailScreen({super.key, required this.chore, required this.profiles});
+  const AssignChoreDetailScreen({Key? key, required this.chore, required this.profiles}) : super(key: key);
 
   @override
   _AssignChoreDetailScreenState createState() => _AssignChoreDetailScreenState();
@@ -70,11 +79,13 @@ class AssignChoreDetailScreen extends StatefulWidget {
 
 class _AssignChoreDetailScreenState extends State<AssignChoreDetailScreen> {
   late List<bool> _selectedProfiles;
+  late List<bool> _selectedDays;
 
   @override
   void initState() {
     super.initState();
     _selectedProfiles = List<bool>.filled(widget.profiles.length, false);
+    _selectedDays = List<bool>.generate(7, (index) => false); // Para los 7 días de la semana
   }
 
   @override
@@ -105,9 +116,39 @@ class _AssignChoreDetailScreenState extends State<AssignChoreDetailScreen> {
                 },
               ),
             ),
+            const Text('Assign Days:'),
+            Wrap(
+              spacing: 8.0,
+              children: List.generate(7, (index) {
+                return ChoiceChip(
+                  label: Text(getDayName(index)), // Función auxiliar para obtener el nombre del día
+                  selected: _selectedDays[index],
+                  onSelected: (bool selected) {
+                    setState(() {
+                      _selectedDays[index] = selected;
+                    });
+                  },
+                );
+              }),
+            ),
             ElevatedButton(
               onPressed: () {
-                // Handle assigning profiles to chore here
+                // Guardar la asignación de perfiles y días aquí
+                List<int> selectedProfileIds = [];
+                for (int i = 0; i < _selectedProfiles.length; i++) {
+                  if (_selectedProfiles[i]) {
+                    selectedProfileIds.add(widget.profiles[i].id);
+                  }
+                }
+                List<String> selectedDays = [];
+                for (int i = 0; i < _selectedDays.length; i++) {
+                  if (_selectedDays[i]) {
+                    selectedDays.add(getDayName(i)); // Agregar el nombre del día seleccionado
+                  }
+                }
+                // Guardar la información de asignación aquí
+
+                Navigator.pop(context); // Volver a la pantalla anterior
               },
               child: const Text('Save'),
             ),
@@ -115,5 +156,27 @@ class _AssignChoreDetailScreenState extends State<AssignChoreDetailScreen> {
         ),
       ),
     );
+  }
+
+  String getDayName(int index) {
+    // Función para obtener el nombre del día dado el índice (0-6)
+    switch (index) {
+      case 0:
+        return 'Monday';
+      case 1:
+        return 'Tuesday';
+      case 2:
+        return 'Wednesday';
+      case 3:
+        return 'Thursday';
+      case 4:
+        return 'Friday';
+      case 5:
+        return 'Saturday';
+      case 6:
+        return 'Sunday';
+      default:
+        return '';
+    }
   }
 }

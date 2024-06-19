@@ -25,7 +25,7 @@ class JoinHouseholdScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const MainScreen()), // Asegúrate de tener MainScreen en main.dart
+                  MaterialPageRoute(builder: (context) => const HomeScreen()), // Asegúrate de tener MainScreen en main.dart
                 );
               },
               child: const Text('Join'),
