@@ -65,7 +65,7 @@ We use the Android Studio emulator to test the application and see the result. H
      ```
    - Select the running emulator as the target device.
 
-### Running Tests
+## Running Tests
 
 To run the tests for this project, use the following command:
 
